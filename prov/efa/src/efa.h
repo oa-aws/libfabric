@@ -109,6 +109,11 @@ struct efa_fabric {
 struct efa_context {
 	uint64_t completion_flags;
 	fi_addr_t addr;
+
+#if HAVE_ESP
+	uint64_t start_ticks;
+	uint64_t length;
+#endif
 };
 
 #if defined(static_assert)

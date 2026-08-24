@@ -9,6 +9,10 @@
 #include "efa_env.h"
 #include "rdm/efa_rdm_proto.h"
 
+#if HAVE_ESP
+#include "efa_tp.h"
+#endif
+
 #ifndef _WIN32
 
 void efa_win_lib_finalize(void)
@@ -252,6 +256,10 @@ EFA_INI
 	ofi_mutex_init(&g_efa_domain_list_lock);
 	dlist_init(&g_efa_domain_list);
 
+#if HAVE_ESP
+	esp_init();
+#endif
+
 	return &efa_prov;
 
 err_free:
@@ -267,6 +275,9 @@ err_free:
  */
 static void efa_prov_finalize(void)
 {
+#if HAVE_ESP
+	esp_finalize();
+#endif
 	efa_util_prov_finalize();
 
 	efa_device_list_finalize();

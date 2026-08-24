@@ -6,6 +6,43 @@
 
 #include <config.h>
 
+#if HAVE_ESP
+
+#include <infiniband/verbs.h>
+
+#include "esp_c.h"
+#include "efa_io_defs.h"
+#include "efa_data_path_direct_structs.h"
+
+#if HAVE_ESP
+extern void esp_init();
+extern void esp_finalize();
+#endif
+
+extern void efa_data_path_direct_tracepoint_post_send_esp(
+	struct efa_qp *qp, struct efa_data_path_direct_sq *sq,
+	struct efa_io_tx_wqe *wqe);
+
+extern void efa_data_path_direct_tracepoint_process_completion_esp(
+	struct efa_qp *qp, struct ibv_cq_ex *ibvcqx,
+	struct efa_io_cdesc_common *cqe);
+
+extern void efa_data_path_direct_send_wr_ring_db_start_esp(
+	struct efa_data_path_direct_sq *sq);
+
+extern void efa_data_path_direct_send_wr_ring_db_end_esp(
+	struct efa_data_path_direct_sq *sq);
+
+extern void efa_cq_readfrom_start_host_esp();
+extern void efa_cq_readfrom_end_host_esp(size_t num_cqe);
+extern void efa_cq_readfrom_start_device_esp();
+extern void efa_cq_readfrom_end_device_esp();
+
+extern void efa_data_path_direct_tracepoint_post_recv_esp(struct efa_qp *qp,
+	struct ibv_recv_wr *wr);
+
+#endif
+
 #if HAVE_LTTNG
 
 #include "efa_tp_def.h"

@@ -1097,6 +1097,31 @@ AS_IF([test "$have_lttng" = "1" && test x"$with_lttng" != x"yes"],
 AM_CONDITIONAL([HAVE_LTTNG], test "$have_lttng" -eq 1)
 AC_DEFINE_UNQUOTED([HAVE_LTTNG], [$have_lttng], [Build with LTTng userspace tracepoints])
 
+dnl Check for ESP profiling capability
+have_esp=0
+AC_ARG_WITH([esp],
+    AS_HELP_STRING([--with-esp=DIR],
+           [Enable ESP userspace profiling @<:@default=no@:>@]))
+
+AS_IF([test -n "$with_esp" && test x"$with_esp" != x"no"],
+      [FI_CHECK_PACKAGE([esp],
+                        [esp_c.h],
+                        [esp],
+                        [esp_initialize],
+                        [],
+                        [$with_esp],
+                        [],
+                        [have_esp=1],
+                        [AC_MSG_ERROR([ESP support requested but libesp is not available.])])
+      ])
+
+AS_IF([test "$have_esp" = "1" && test x"$with_esp" != x"yes"],
+      [CPPFLAGS="$CPPFLAGS $esp_CPPFLAGS -DESP_FAST_TIME"
+       LDFLAGS="$LDFLAGS $esp_LDFLAGS -lesp_common -lesp"])
+
+AM_CONDITIONAL([HAVE_ESP], test "$have_esp" -eq 1)
+AC_DEFINE_UNQUOTED([HAVE_ESP], [$have_esp], [Build with ESP userspace profiling])
+
 AS_IF([test "$enable_memhooks" = "1"], [
 	AC_CHECK_FUNCS([__curbrk __clear_cache])
 	AC_CHECK_HEADERS([linux/mman.h sys/syscall.h])
