@@ -868,6 +868,9 @@ ssize_t efa_cq_readfrom(struct fid_cq *cq_fid, void *buf, size_t count,
 	if (OFI_UNLIKELY((!buf || !count)))
 		return -FI_EAGAIN;
 
+#if HAVE_ESP
+	efa_cq_readfrom_start_host_esp();
+#endif
 	efa_cq = container_of(cq_fid, struct efa_cq, util_cq.cq_fid);
 
 	/* Most reads in a busy-poll loop find nothing; skip the lock for those */
@@ -885,6 +888,9 @@ ssize_t efa_cq_readfrom(struct fid_cq *cq_fid, void *buf, size_t count,
 
 	ibv_cq = &efa_cq->ibv_cq;
 
+#if HAVE_ESP
+	efa_cq_readfrom_start_device_esp();
+#endif
 	/* Call ibv_start_poll only once */
 	efa_cq_start_poll(ibv_cq);
 
@@ -922,8 +928,16 @@ ssize_t efa_cq_readfrom(struct fid_cq *cq_fid, void *buf, size_t count,
 	}
 	efa_cq_end_poll(ibv_cq);
 
+#if HAVE_ESP
+	efa_cq_readfrom_end_device_esp();
+#endif
+
 out:
 	EFA_GENLOCK_UNLOCK(&efa_cq->util_cq.ep_list_lock, efa_cq_ep_list_lock_sym);
+
+#if HAVE_ESP
+	efa_cq_readfrom_end_host_esp(num_cqe);
+#endif
 	return num_cqe ? num_cqe : err;
 }
 

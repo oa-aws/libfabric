@@ -444,6 +444,9 @@ efa_data_path_direct_process_ex_cqe(struct efa_ibv_cq *ibv_cq,
 #if HAVE_LTTNG
 	efa_data_path_direct_tracepoint_process_completion(qp, ibvcqx, cqe);
 #endif /* HAVE_LTTNG */
+#if HAVE_ESP
+	efa_data_path_direct_tracepoint_process_completion_esp(qp, ibvcqx, cqe);
+#endif
 }
 
 /**
@@ -868,15 +871,24 @@ efa_data_path_direct_send_wr_post(
 #if HAVE_LTTNG
 	efa_data_path_direct_tracepoint_post_send(qp, sq, wqe);
 #endif
+#if HAVE_ESP
+	efa_data_path_direct_tracepoint_post_send_esp(qp, sq, wqe);
+#endif
 }
 
 EFA_ALWAYS_INLINE void
 efa_data_path_direct_send_wr_ring_db(struct efa_data_path_direct_sq *sq)
 {
+#if HAVE_ESP
+	efa_data_path_direct_send_wr_ring_db_start_esp(sq);
+#endif
 	mmio_flush_writes();
 	efa_sq_ring_doorbell(sq, sq->wq.pc);
 	sq->num_uncommitted_wqes = sq->num_wqe_pending;
 	sq->num_wqe_pending = 0;
+#if HAVE_ESP
+	efa_data_path_direct_send_wr_ring_db_end_esp(sq);
+#endif
 }
 
 /*

@@ -90,6 +90,9 @@ static inline int efa_data_path_direct_post_recv(struct efa_qp *qp,
 #if HAVE_LTTNG
 		efa_data_path_direct_tracepoint_post_recv(qp, wr);
 #endif
+#if HAVE_ESP
+		efa_data_path_direct_tracepoint_post_recv_esp(qp, wr);
+#endif
 		wr = wr->next;
 	}
 
